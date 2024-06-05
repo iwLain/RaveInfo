@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mx-auto py-5 bg-gray-900 text-white">
+    <h1 class="text-center text-3xl mb-5">DJ Schedule</h1>
+    <div class="flex flex-wrap justify-center">
+        <div class="w-full lg:w-1/2 p-4">
+            <h2 class="text-2xl mb-4">Lineup</h2>
+            <ul>
+                {% for dj, (time, genre, soundcloud, instagram) in djs.items() %}
+                <li class="mb-2 p-2 {% if dj == current_dj %}bg-green-500 text-white{% else %}bg-gray-700 text-gray-300{% endif %} shadow-md rounded-lg flex justify-between items-center">
+                    <div>
+                        <h5 class="font-bold">{{ dj }}</h5>
+                        <p>Time: {{ time }}</p>
+                        <p>Genre: {{ genre }}</p>
+                    </div>
+                    <div class="flex space-x-2">
+                        <a href="{{ soundcloud }}" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white p-2 rounded-full">
+                            <i class="fab fa-soundcloud fa-lg"></i>
+                        </a>
+                        <a href="{{ instagram }}" target="_blank" class="bg-pink-500 hover:bg-pink-700 text-white p-2 rounded-full">
+                            <i class="fab fa-instagram fa-lg"></i>
+                        </a>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

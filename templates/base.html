@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+    <!-- Add FontAwesome -->
+    <script src="https://kit.fontawesome.com/f0ec899e18.js" crossorigin="anonymous"></script>
+</head>
+<body class="bg-gray-900 text-white">
+    <nav class="bg-gray-800 p-4">
+        <ul class="flex justify-center space-x-4 md:space-x-8 lg:space-x-12 xl:space-x-16 2xl:space-x-20">
+            <li class="flex items-center space-x-2">
+                <i class="fas fa-home text-white"></i>
+                <a href="/" class="text-white">Home</a>
+            </li>
+            <li class="flex items-center space-x-2">
+                <i class="fas fa-calendar-alt text-white"></i>
+                <a href="schedule" class="text-white">Schedule</a>
+            </li>
+            <li class="flex items-center space-x-2">
+                <i class="fas fa-cocktail text-white"></i>
+                <a href="drinks" class="text-white">Drinks</a>
+            </li>
+            <li class="flex items-center space-x-2">
+                <i class="fas fa-map-marker-alt text-white"></i>
+                <a href="location" class="text-white">Location</a>
+            </li>
+        </ul>
+    </nav>
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+    <footer class="bg-gray-800">
+        <!-- Footer items -->
+    </footer>
+</body>
+</html>
