@@ -1,18 +1,23 @@
 import os
 import configparser
-from datetime import datetime, timedelta
+from datetime import datetime
 import pytz
-from flask import Flask, render_template, request, redirect, url_for, send_from_directory, flash
+from flask import Flask, render_template, request, redirect, url_for, send_from_directory, flash, session
 from werkzeug.utils import secure_filename
 from collections import OrderedDict
+from flask_bcrypt import Bcrypt
 
 UPLOAD_FOLDER = 'static'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+CONFIG_FILE = 'config.ini'
+PASSWORD_FILE = 'password.txt'
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB max file size
 app.secret_key = 'supersecretkey'
+
+bcrypt = Bcrypt(app)
 
 # Ensure the upload folder exists
 if not os.path.exists(UPLOAD_FOLDER):
@@ -28,10 +33,23 @@ class PreservingConfigParser(configparser.ConfigParser):
         return d.items()
 
 config = PreservingConfigParser()
-config.read('config.ini')
+config.read(CONFIG_FILE)
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def save_password(password):
+    hashed = bcrypt.generate_password_hash(password).decode('utf-8')
+    with open(PASSWORD_FILE, 'w') as f:
+        f.write(hashed)
+
+def check_password(password):
+    try:
+        with open(PASSWORD_FILE, 'r') as f:
+            hashed = f.read()
+        return bcrypt.check_password_hash(hashed, password)
+    except FileNotFoundError:
+        return False
 
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
@@ -108,10 +126,30 @@ def drinks():
         drinks = {}
     return render_template('drinks.html', drinks=drinks)
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        password = request.form['password']
+        if check_password(password):
+            session['logged_in'] = True
+            return redirect(url_for('config_page'))
+        else:
+            flash('Invalid password.')
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    session.pop('logged_in', None)
+    flash('You were logged out.')
+    return redirect(url_for('login'))
+
 @app.route('/config', methods=['GET', 'POST'])
 def config_page():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+
     ensure_sections()
-    editable_sections = ['DJ SCHEDULE', 'DRINKS', 'HOME', 'LOCATION']  # Include 'LOCATION' in editable sections
+    editable_sections = ['DJ SCHEDULE', 'DRINKS', 'HOME', 'LOCATION', 'ADMIN']  # Include 'ADMIN' in editable sections
     if request.method == 'POST':
         if 'save' in request.form:
             try:
@@ -158,7 +196,12 @@ def config_page():
                     elif section == 'LOCATION':
                         location_link = request.form.get('location-link', '')
                         config.set('LOCATION', 'link', location_link)
-                with open('config.ini', 'w') as configfile:
+                    elif section == 'ADMIN':
+                        new_password = request.form.get('admin-password', '')
+                        if new_password:
+                            save_password(new_password)
+                            flash('Admin password updated successfully.')
+                with open(CONFIG_FILE, 'w') as configfile:
                     config.write(configfile)
             except Exception as e:
                 flash(f"Error saving configuration: {e}")
@@ -167,7 +210,7 @@ def config_page():
                 section, key = request.form['delete'].split('-')
                 if section in editable_sections:  # Only allow deleting from editable sections
                     config.remove_option(section, key)
-                    with open('config.ini', 'w') as configfile:
+                    with open(CONFIG_FILE, 'w') as configfile:
                         config.write(configfile)
             except Exception as e:
                 flash(f"Error deleting item: {e}")
@@ -180,7 +223,7 @@ def config_page():
                 new_dj_instagram = request.form.get('new-dj-instagram', '')
                 dj_details = ', '.join(filter(None, [new_dj_time, new_dj_genre, new_dj_soundcloud, new_dj_instagram]))
                 config.set('DJ SCHEDULE', new_dj_name, dj_details)
-                with open('config.ini', 'w') as configfile:
+                with open(CONFIG_FILE, 'w') as configfile:
                     config.write(configfile)
             except Exception as e:
                 flash(f"Error adding DJ: {e}")
@@ -191,7 +234,7 @@ def config_page():
                 new_drink_amount = request.form.get('new-drink-amount', '')
                 drink_details = ', '.join(filter(None, [new_drink_price, new_drink_amount]))
                 config.set('DRINKS', new_drink_name, drink_details)
-                with open('config.ini', 'w') as configfile:
+                with open(CONFIG_FILE, 'w') as configfile:
                     config.write(configfile)
             except Exception as e:
                 flash(f"Error adding drink: {e}")
@@ -207,13 +250,12 @@ def config_page():
                 config.set('HOME', 'image', 'event.png')
                 config.add_section('LOCATION')
                 config.set('LOCATION', 'link', '')
-                with open('config.ini', 'w') as configfile:
+                with open(CONFIG_FILE, 'w') as configfile:
                     config.write(configfile)
             except Exception as e:
                 flash(f"Error clearing configuration: {e}")
         return redirect(url_for('config_page'))
     else:
-        # handle GET request here
         try:
             dj_config = {key: parse_dj_details(value.split(', ')) for key, value in config.items('DJ SCHEDULE')}
         except configparser.NoSectionError:
@@ -266,7 +308,7 @@ def parse_dj_details(details):
     return parsed
 
 def ensure_sections():
-    sections = ['DJ SCHEDULE', 'DRINKS', 'HOME', 'LOCATION']
+    sections = ['DJ SCHEDULE', 'DRINKS', 'HOME', 'LOCATION', 'ADMIN']
     for section in sections:
         if section not in config.sections():
             config.add_section(section)
@@ -276,8 +318,10 @@ def ensure_sections():
         config.set('HOME', 'image', 'event.png')
     if 'link' not in config['LOCATION']:
         config.set('LOCATION', 'link', '')
-    with open('config.ini', 'w') as configfile:
+    with open(CONFIG_FILE, 'w') as configfile:
         config.write(configfile)
 
 if __name__ == "__main__":
+    if not os.path.exists(PASSWORD_FILE):
+        save_password('admin')  # Set a default password if none exists
     app.run(host="0.0.0.0", port=5000)  # Specify the port if needed
