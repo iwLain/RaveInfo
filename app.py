@@ -1,7 +1,17 @@
+import os
 import configparser
 from datetime import datetime
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, send_from_directory, flash
+from werkzeug.utils import secure_filename
 from collections import OrderedDict
+
+UPLOAD_FOLDER = 'static'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB max file size
+app.secret_key = 'supersecretkey'
 
 class PreservingConfigParser(configparser.ConfigParser):
     def __init__(self, *args, **kwargs):
@@ -15,30 +25,12 @@ class PreservingConfigParser(configparser.ConfigParser):
 config = PreservingConfigParser()
 config.read('config.ini')
 
-app = Flask(__name__)
-app.debug = config.getboolean('FLASK', 'debug', fallback=True)
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def ensure_sections():
-    sections = ['DJ SCHEDULE', 'DRINKS', 'HOME']
-    for section in sections:
-        if section not in config.sections():
-            config.add_section(section)
-    if 'text' not in config['HOME']:
-        config.set('HOME', 'text', 'Welcome to our event!')
-    with open('config.ini', 'w') as configfile:
-        config.write(configfile)
-
-def parse_dj_details(details):
-    parsed = {'time': '', 'genre': '', 'soundcloud': '', 'instagram': ''}
-    if len(details) > 0:
-        parsed['time'] = details[0]
-    if len(details) > 1:
-        parsed['genre'] = details[1]
-    if len(details) > 2:
-        parsed['soundcloud'] = details[2]
-    if len(details) > 3:
-        parsed['instagram'] = details[3]
-    return parsed
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 @app.route('/')
 def home():
@@ -47,7 +39,11 @@ def home():
         config_text = config.get('HOME', 'text')
     except configparser.NoOptionError:
         config_text = "Welcome to our event!"
-    return render_template('home.html', config_text=config_text)
+    try:
+        image_path = config.get('HOME', 'image')
+    except configparser.NoOptionError:
+        image_path = "event.png"
+    return render_template('home.html', config_text=config_text, image_path=image_path)
 
 @app.route('/schedule')
 def schedule():
@@ -111,6 +107,15 @@ def config_page():
                 elif section == 'HOME':
                     home_text = request.form.get('home-text', 'Welcome to our event!')
                     config.set('HOME', 'text', home_text)
+                    if 'home-image' in request.files:
+                        file = request.files['home-image']
+                        if file and allowed_file(file.filename):
+                            filename = secure_filename(file.filename)
+                            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                            config.set('HOME', 'image', filename)
+                            flash('Image successfully uploaded and displayed below')
+                        else:
+                            flash('Allowed image types are - png, jpg, jpeg, gif')
             with open('config.ini', 'w') as configfile:
                 config.write(configfile)
         elif 'delete' in request.form:
@@ -145,6 +150,7 @@ def config_page():
             config.add_section('DRINKS')
             config.add_section('HOME')
             config.set('HOME', 'text', 'Welcome to our event!')
+            config.set('HOME', 'image', 'event.png')
             with open('config.ini', 'w') as configfile:
                 config.write(configfile)
         return redirect(url_for('config_page'))
@@ -155,12 +161,38 @@ def config_page():
             dj_config = {key: parse_dj_details(value.split(', ')) for key, value in config.items('DJ SCHEDULE')}
             drinks_config = {key: value.split(', ') for key, value in config.items('DRINKS')}
             home_text = config.get('HOME', 'text')
+            home_image = config.get('HOME', 'image', fallback="event.png")
         except configparser.NoSectionError:
             dj_config = {}
             drinks_config = {}
             home_text = 'Welcome to our event!'
+            home_image = "event.png"
         sections = config.sections()  # Fetch the sections from the config
-        return render_template('config.html', dj_config=dj_config, drinks_config=drinks_config, sections=sections, home_text=home_text)
+        return render_template('config.html', dj_config=dj_config, drinks_config=drinks_config, sections=sections, home_text=home_text, home_image=home_image)
+
+def parse_dj_details(details):
+    parsed = {'time': '', 'genre': '', 'soundcloud': '', 'instagram': ''}
+    if len(details) > 0:
+        parsed['time'] = details[0]
+    if len(details) > 1:
+        parsed['genre'] = details[1]
+    if len(details) > 2:
+        parsed['soundcloud'] = details[2]
+    if len(details) > 3:
+        parsed['instagram'] = details[3]
+    return parsed
+
+def ensure_sections():
+    sections = ['DJ SCHEDULE', 'DRINKS', 'HOME']
+    for section in sections:
+        if section not in config.sections():
+            config.add_section(section)
+    if 'text' not in config['HOME']:
+        config.set('HOME', 'text', 'Welcome to our event!')
+    if 'image' not in config['HOME']:
+        config.set('HOME', 'image', 'event.png')
+    with open('config.ini', 'w') as configfile:
+        config.write(configfile)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)  # Specify the port if needed
