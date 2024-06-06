@@ -1,7 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
-<img src="static/event.png" alt="Event Image" class="w-full max-h-64">
-<div class="flex items-center justify-center h-screen">
-    <p class="text-white text-2xl text-center">{{ config_text }}</p>
+<div class="m-10 mx-auto">
+    <img src="static/event.png" alt="Event Image" class="max-w-md mx-auto object-contain">
+</div>
+<div class="mt-10 p-5 text-center">
+    <p>{{ config_text }}</p>
+</div>
 </div>
 {% endblock %}

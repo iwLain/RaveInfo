@@ -3,15 +3,14 @@
 <div class="container mx-auto py-5 bg-gray-900 text-white">
     <h1 class="text-center text-3xl mb-5">Drinks</h1>
     <div class="flex flex-wrap justify-center flex-col md:flex-row">
-        {% for drink, price in drinks.items() %}
+        {% for drink, details in drinks.items() %}
         <div class="w-full md:w-1/3 lg:w-1/4 p-2">
             <ul>
-                <li class="mb-2 p-2 bg-gray-700 text-gray-300 shadow-md rounded-lg flex justify-between items-center">
+                <li class="mb-2 p-2 bg-gray-700 text-gray-300 shadow-md rounded-lg flex flex-col justify-between items-start">
                     <div>
                         <h5 class="font-bold">{{ drink }}</h5>
-                    </div>
-                    <div>
-                        <p>{{ price }}</p>
+                        <p>Amount: {{ details[1] if details|length > 1 else 'N/A' }}</p>
+                        <p>Price: {{ details[0] }}</p>
                     </div>
                 </li>
             </ul>
