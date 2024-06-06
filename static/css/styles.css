@@ -573,6 +573,9 @@ video {
 .mb-6 {
   margin-bottom: 1.5rem;
 }
+.mt-1 {
+  margin-top: 0.25rem;
+}
 .mt-10 {
   margin-top: 2.5rem;
 }
@@ -621,9 +624,6 @@ video {
 .max-w-md {
   max-width: 28rem;
 }
-.max-w-xs {
-  max-width: 20rem;
-}
 .flex-col {
   flex-direction: column;
 }
@@ -664,6 +664,11 @@ video {
   --tw-space-y-reverse: 0;
   margin-top: calc(2.5rem * calc(1 - var(--tw-space-y-reverse)));
   margin-bottom: calc(2.5rem * var(--tw-space-y-reverse));
+}
+.space-y-6 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(1.5rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(1.5rem * var(--tw-space-y-reverse));
 }
 .divide-y > :not([hidden]) ~ :not([hidden]) {
   --tw-divide-y-reverse: 0;
