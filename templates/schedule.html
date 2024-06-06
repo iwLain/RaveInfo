@@ -7,30 +7,25 @@
             <h2 class="text-2xl mb-4">Lineup</h2>
             <ul>
                 {% for dj, details in djs.items() %}
-                {% if details|length == 4 %}
                 <li class="mb-2 p-2 {% if dj == current_dj %}bg-green-500 text-white{% else %}bg-gray-700 text-gray-300{% endif %} shadow-md rounded-lg flex justify-between items-center">
                     <div>
                         <h5 class="font-bold">{{ dj }}</h5>
-                        <p>Time: {{ details[0] }}</p>
-                        <p>Genre: {{ details[1] }}</p>
+                        <p>Time: {{ details['time'] }}</p>
+                        <p>Genre: {{ details['genre'] }}</p>
                     </div>
                     <div class="flex space-x-2">
-                        <a href="{{ details[2] }}" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white p-2 rounded-full">
+                        {% if details['soundcloud'] %}
+                        <a href="{{ details['soundcloud'] }}" target="_blank" class="bg-gray-600 hover:bg-gray-800 text-white p-2 rounded-full">
                             <i class="fab fa-soundcloud fa-lg"></i>
                         </a>
-                        <a href="{{ details[3] }}" target="_blank" class="bg-pink-500 hover:bg-pink-700 text-white p-2 rounded-full">
+                        {% endif %}
+                        {% if details['instagram'] %}
+                        <a href="{{ details['instagram'] }}" target="_blank" class="bg-gray-600 hover:bg-gray-800 text-white p-2 rounded-full">
                             <i class="fab fa-instagram fa-lg"></i>
                         </a>
+                        {% endif %}
                     </div>
                 </li>
-                {% else %}
-                <li class="mb-2 p-2 bg-red-500 text-white shadow-md rounded-lg">
-                    <div>
-                        <h5 class="font-bold">{{ dj }}</h5>
-                        <p>Missing information</p>
-                    </div>
-                </li>
-                {% endif %}
                 {% endfor %}
             </ul>
         </div>

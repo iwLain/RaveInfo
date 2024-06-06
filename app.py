@@ -1,8 +1,18 @@
 import configparser
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for
+from collections import OrderedDict
 
-config = configparser.ConfigParser()
+class PreservingConfigParser(configparser.ConfigParser):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.optionxform = str  # Preserve the case of keys
+
+    def items(self, section, raw=False, vars=None):
+        d = OrderedDict(super().items(section, raw=raw, vars=vars))
+        return d.items()
+
+config = PreservingConfigParser()
 config.read('config.ini')
 
 app = Flask(__name__)
@@ -67,7 +77,7 @@ def drinks():
 @app.route('/config', methods=['GET', 'POST'])
 def config_page():
     ensure_sections()
-    editable_sections = ['DJ SCHEDULE', 'DRINKS']  # Define the sections that can be edited
+    editable_sections = ['DJ SCHEDULE', 'DRINKS', 'HOME']  # Include 'HOME' in editable sections
     if request.method == 'POST':
         if 'save' in request.form:
             for section in editable_sections:  # Only iterate over editable sections
@@ -98,6 +108,9 @@ def config_page():
                                     drinks_to_update[drink_name].append(value)
                     for drink_name, details in drinks_to_update.items():
                         config.set(section, drink_name, ', '.join(details))
+                elif section == 'HOME':
+                    home_text = request.form.get('home-text', 'Welcome to our event!')
+                    config.set('HOME', 'text', home_text)
             with open('config.ini', 'w') as configfile:
                 config.write(configfile)
         elif 'delete' in request.form:
@@ -141,11 +154,13 @@ def config_page():
         try:
             dj_config = {key: parse_dj_details(value.split(', ')) for key, value in config.items('DJ SCHEDULE')}
             drinks_config = {key: value.split(', ') for key, value in config.items('DRINKS')}
+            home_text = config.get('HOME', 'text')
         except configparser.NoSectionError:
             dj_config = {}
             drinks_config = {}
+            home_text = 'Welcome to our event!'
         sections = config.sections()  # Fetch the sections from the config
-        return render_template('config.html', dj_config=dj_config, drinks_config=drinks_config, sections=sections)
+        return render_template('config.html', dj_config=dj_config, drinks_config=drinks_config, sections=sections, home_text=home_text)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)  # Specify the port if needed
