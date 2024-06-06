@@ -148,4 +148,4 @@ def config_page():
         return render_template('config.html', dj_config=dj_config, drinks_config=drinks_config, sections=sections)
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host="0.0.0.0", port=5000)  # Specify the port if needed
