@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en" class="dark h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +7,7 @@
     <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
     <script src="https://kit.fontawesome.com/f0ec899e18.js" crossorigin="anonymous"></script>
 </head>
-<body class="bg-gray-900 text-white">
+<body class="bg-gray-900 text-white flex flex-col min-h-screen pb-16">
     <nav class="bg-gray-800 p-4">
         <ul class="flex justify-center space-x-4 md:space-x-8 lg:space-x-12 xl:space-x-16 2xl:space-x-20">
             <li class="flex items-center space-x-2">
@@ -16,7 +16,7 @@
             </li>
             <li class="flex items-center space-x-2">
                 <i class="fas fa-calendar-alt text-white"></i>
-                <a href="/schedule" class="text-white">Schedule</a>
+                <a href="/schedule" class="text-white">Timetable</a>
             </li>
             <li class="flex items-center space-x-2">
                 <i class="fas fa-cocktail text-white"></i>
@@ -28,13 +28,13 @@
             </li>
         </ul>
     </nav>
-    <main class="flex justify-center w-full">
+    <main class="flex justify-center w-full flex-grow">
         <div class="w-11/12 max-w-6xl p-4">
             {% block content %}
             {% endblock %}
         </div>
     </main>
-    <footer class="bg-gray-800 p-4 text-center text-gray-400">
+    <footer class="bg-gray-800 p-4 text-center text-gray-400 fixed bottom-0 w-full">
         © 2024 Finn Beer
     </footer>
 </body>

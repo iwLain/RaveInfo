@@ -548,8 +548,14 @@ video {
 .static {
   position: static;
 }
+.fixed {
+  position: fixed;
+}
 .relative {
   position: relative;
+}
+.bottom-0 {
+  bottom: 0px;
 }
 .m-10 {
   margin: 2.5rem;
@@ -594,6 +600,9 @@ video {
 .table {
   display: table;
 }
+.h-full {
+  height: 100%;
+}
 .h-screen {
   height: 100vh;
 }
@@ -623,6 +632,9 @@ video {
 }
 .max-w-md {
   max-width: 28rem;
+}
+.flex-grow {
+  flex-grow: 1;
 }
 .flex-col {
   flex-direction: column;
@@ -776,6 +788,9 @@ video {
 .py-6 {
   padding-top: 1.5rem;
   padding-bottom: 1.5rem;
+}
+.pb-16 {
+  padding-bottom: 4rem;
 }
 .text-left {
   text-align: left;
