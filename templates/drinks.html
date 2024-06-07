@@ -7,9 +7,9 @@
         <h2 class="text-2xl mb-3">{{ category }}</h2>
         <div class="flex flex-wrap justify-center flex-col md:flex-row">
             {% for drink in drinks %}
-            <div class="w-full md:w-1/3 lg:w-1/4 p-2">
+            <div class="w-full md:w-1/3 lg:w-1/4 p-2 drink-item" data-name="{{ drink.name }}" data-amount="{{ drink.amount }}">
                 <ul>
-                    <li class="mb-2 p-2 bg-gray-700 text-gray-300 shadow-md rounded-lg flex flex-col justify-between items-start">
+                    <li class="drink-card mb-2 p-2 bg-gray-700 text-gray-300 shadow-md rounded-lg flex flex-col justify-between items-start">
                         <div>
                             <h5 class="font-bold">{{ drink.name }}</h5>
                             <p>Amount: {{ drink.amount }}</p>
@@ -22,5 +22,109 @@
         </div>
     </div>
     {% endfor %}
+    <div class="flex justify-center mt-6 space-x-4">
+        <button id="bar-helper-btn" class="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded">
+            Bar-Helfer
+        </button>
+        <div id="current-order" class="text-white"></div>
+    </div>
 </div>
+
+<!-- Popup for entering amount of orders -->
+<div id="popup" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden z-40">
+    <div class="bg-gray-800 p-5 rounded-lg shadow-lg text-white">
+        <h2 id="popup-drink-name" class="text-2xl mb-4"></h2>
+        <p id="popup-drink-amount" class="mb-4"></p>
+        <input type="number" id="order-amount" min="1" class="w-full p-2 mb-4 bg-gray-700 rounded">
+        <div class="flex justify-between">
+            <button id="popup-cancel-btn" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Cancel</button>
+            <button id="popup-confirm-btn" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<!-- Fullscreen overlay for selected drinks -->
+<div id="fullscreen-overlay" class="fixed inset-0 bg-black bg-opacity-90 text-white flex flex-col justify-center items-center hidden z-50 p-4">
+    <button id="close-overlay" class="absolute top-5 right-5 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+        Close
+    </button>
+    <div id="selected-drinks" class="text-4xl md:text-6xl font-bold text-center space-y-6 md:space-y-8"></div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const drinkItems = document.querySelectorAll(".drink-item");
+    const selectedDrinks = new Map();
+    const barHelperBtn = document.getElementById("bar-helper-btn");
+    const currentOrderDiv = document.getElementById("current-order");
+    const fullscreenOverlay = document.getElementById("fullscreen-overlay");
+    const selectedDrinksDiv = document.getElementById("selected-drinks");
+    const closeOverlayBtn = document.getElementById("close-overlay");
+    const popup = document.getElementById("popup");
+    const popupDrinkName = document.getElementById("popup-drink-name");
+    const popupDrinkAmount = document.getElementById("popup-drink-amount");
+    const orderAmountInput = document.getElementById("order-amount");
+    const popupCancelBtn = document.getElementById("popup-cancel-btn");
+    const popupConfirmBtn = document.getElementById("popup-confirm-btn");
+    let currentDrink = null;
+
+    function updateCurrentOrder() {
+        currentOrderDiv.innerHTML = "Current Order: " + Array.from(selectedDrinks.values()).map(drink => `${drink.name} (${drink.orderAmount})`).join(", ");
+    }
+
+    drinkItems.forEach(item => {
+        item.addEventListener("click", function() {
+            currentDrink = {
+                name: this.getAttribute("data-name"),
+                amount: this.getAttribute("data-amount"),
+                element: this
+            };
+            if (selectedDrinks.has(currentDrink.name)) {
+                selectedDrinks.delete(currentDrink.name);
+                this.querySelector(".drink-card").classList.remove("bg-orange-500");
+                updateCurrentOrder();
+            } else {
+                popupDrinkName.textContent = currentDrink.name;
+                popupDrinkAmount.textContent = `Volume: ${currentDrink.amount}`;
+                orderAmountInput.value = 1;
+                popup.classList.remove("hidden");
+            }
+        });
+    });
+
+    popupCancelBtn.addEventListener("click", function() {
+        popup.classList.add("hidden");
+    });
+
+    popupConfirmBtn.addEventListener("click", function() {
+        const orderAmount = orderAmountInput.value;
+        if (orderAmount > 0) {
+            selectedDrinks.set(currentDrink.name, {
+                name: currentDrink.name,
+                amount: currentDrink.amount,
+                orderAmount: orderAmount
+            });
+            currentDrink.element.querySelector(".drink-card").classList.add("bg-orange-500");
+            popup.classList.add("hidden");
+            updateCurrentOrder();
+        }
+    });
+
+    barHelperBtn.addEventListener("click", function() {
+        if (selectedDrinks.size > 0) {
+            selectedDrinksDiv.innerHTML = "";
+            selectedDrinks.forEach(drink => {
+                const drinkElement = document.createElement("div");
+                drinkElement.innerHTML = `<strong>${drink.name}</strong><br>Volume: ${drink.amount}<br>Orders: ${drink.orderAmount}`;
+                selectedDrinksDiv.appendChild(drinkElement);
+            });
+            fullscreenOverlay.classList.remove("hidden");
+        }
+    });
+
+    closeOverlayBtn.addEventListener("click", function() {
+        fullscreenOverlay.classList.add("hidden");
+    });
+});
+</script>
 {% endblock %}
