@@ -1,6 +1,7 @@
 from flask import render_template, request, redirect, url_for, flash, session
 from app import app, config, CONFIG_FILE
 from utils import ensure_sections, parse_dj_details, allowed_file, save_password
+import configparser
 
 @app.route('/config', methods=['GET', 'POST'])
 def config_page():

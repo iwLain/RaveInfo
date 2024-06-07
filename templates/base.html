@@ -13,22 +13,22 @@
             to { opacity: 1; }
         }
 
+        @keyframes scaleUp {
+            from { transform: scale(0.95); }
+            to { transform: scale(1); }
+        }
+
         .fade-in {
-            animation: fadeIn 1s ease-in-out;
+            animation: fadeIn 0.5s ease-in-out;
         }
 
-        @keyframes slideIn {
-            from { transform: translateX(-100%); }
-            to { transform: translateX(0); }
-        }
-
-        .slide-in {
-            animation: slideIn 0.5s ease-out;
+        .scale-up {
+            animation: scaleUp 0.3s ease-in-out;
         }
     </style>
 </head>
-<body class="bg-gray-900 text-white flex flex-col min-h-screen pb-16">
-    <nav class="bg-gray-800 p-4 fade-in transition duration-500 ease-in-out transform hover:scale-105">
+<body class="bg-gray-900 text-white flex flex-col min-h-screen">
+    <nav class="bg-gray-800 p-4 fade-in transition duration-300 ease-in-out transform hover:scale-105">
         <ul class="flex justify-center space-x-4 md:space-x-8 lg:space-x-12 xl:space-x-16 2xl:space-x-20">
             <li class="flex items-center space-x-2 hover:text-indigo-400">
                 <i class="fas fa-home text-white"></i>
@@ -49,13 +49,13 @@
         </ul>
     </nav>
     <main class="flex justify-center w-full flex-grow">
-        <div class="w-11/12 max-w-6xl p-4 slide-in opacity-0 transition-opacity duration-500 ease-in-out">
+        <div class="w-11/12 max-w-6xl p-4 fade-in scale-up opacity-0 transition-opacity duration-300 ease-in-out">
             {% block content %}
             {% endblock %}
         </div>
     </main>
-    <footer class="bg-gray-800 p-4 text-center text-gray-400">
-        © 2024 Finn Beer
+    <footer class="bg-gray-800 p-4 text-center text-gray-400 mt-auto">
+        © 2024 Finn Beer | <a href="https://github.com/iwLain/RaveInfo" class="text-indigo-400 hover:text-indigo-600" target="_blank">GitHub</a>
     </footer>
     <script>
         // JavaScript to add opacity transition on page load
