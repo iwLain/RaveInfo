@@ -41,7 +41,8 @@
                                                 <input name="DJ SCHEDULE-{{ dj }}-instagram" value="{{ details['instagram'] }}" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 w-full p-2">
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                <button type="submit" name="delete" value="DJ SCHEDULE-{{ dj }}" class="text-red-600 hover:text-red-900">
+                                                <button type="submit" name="action" value="delete" class="text-red-600 hover:text-red-900">
+                                                    <input type="hidden" name="delete" value="DJ SCHEDULE-{{ dj }}">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </td>
@@ -67,7 +68,7 @@
                             <input name="new-dj-instagram" placeholder="Instagram (optional)" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 p-2 w-40">
                         </div>
                         <div class="flex justify-center mt-6">
-                            <button type="submit" name="add-dj" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                            <button type="submit" name="action" value="add-dj" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
                                 <i class="fas fa-plus"></i> Add DJ
                             </button>
                         </div>
@@ -99,7 +100,8 @@
                                                 <input name="DRINKS-{{ drink }}-price" value="{{ details[0] }}" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 w-full p-2">
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                <button type="submit" name="delete" value="DRINKS-{{ drink }}" class="text-red-600 hover:text-red-900">
+                                                <button type="submit" name="action" value="delete" class="text-red-600 hover:text-red-900">
+                                                    <input type="hidden" name="delete" value="DRINKS-{{ drink }}">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </td>
@@ -123,7 +125,7 @@
                             <input name="new-drink-price" placeholder="Price" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 p-2 w-40">
                         </div>
                         <div class="flex justify-center mt-6">
-                            <button type="submit" name="add-drink" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                            <button type="submit" name="action" value="add-drink" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
                                 <i class="fas fa-plus"></i> Add Drink
                             </button>
                         </div>
@@ -162,10 +164,10 @@
             </div>
         {% endfor %}
         <div class="flex justify-center space-x-4 mt-10">
-            <button type="submit" name="save" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
+            <button type="submit" name="action" value="save" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
                 <i class="fas fa-save"></i> Save
             </button>
-            <button type="submit" name="clear" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+            <button type="submit" name="action" value="clear" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
                 <i class="fas fa-trash-alt"></i> Clear All
             </button>
         </div>
