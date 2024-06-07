@@ -25,26 +25,33 @@
         .scale-up {
             animation: scaleUp 0.3s ease-in-out;
         }
+
+        .active {
+            background-color: #4A5568; /* Tailwind's gray-700 */
+            color: #E2E8F0; /* Tailwind's gray-200 */
+            border-radius: 0.375rem; /* Tailwind's rounded-md */
+            padding: 0.5rem 1rem;
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-white flex flex-col min-h-screen">
     <nav class="bg-gray-800 p-4 fade-in transition duration-300 ease-in-out transform hover:scale-105">
         <ul class="flex justify-center space-x-4 md:space-x-8 lg:space-x-12 xl:space-x-16 2xl:space-x-20">
-            <li class="flex items-center space-x-2 hover:text-indigo-400">
-                <i class="fas fa-home text-white"></i>
-                <a href="/" class="text-white">Home</a>
+            <li class="flex items-center space-x-2 hover:text-indigo-400 {% if request.path == '/' %}active{% endif %}">
+                <i class="fas fa-home"></i>
+                <a href="/" class="text-white {% if request.path == '/' %}font-bold{% endif %}">Home</a>
             </li>
-            <li class="flex items-center space-x-2 hover:text-indigo-400">
-                <i class="fas fa-calendar-alt text-white"></i>
-                <a href="/schedule" class="text-white">Timetable</a>
+            <li class="flex items-center space-x-2 hover:text-indigo-400 {% if request.path == '/schedule' %}active{% endif %}">
+                <i class="fas fa-calendar-alt"></i>
+                <a href="/schedule" class="text-white {% if request.path == '/schedule' %}font-bold{% endif %}">Timetable</a>
             </li>
-            <li class="flex items-center space-x-2 hover:text-indigo-400">
-                <i class="fas fa-cocktail text-white"></i>
-                <a href="/drinks" class="text-white">Drinks</a>
+            <li class="flex items-center space-x-2 hover:text-indigo-400 {% if request.path == '/drinks' %}active{% endif %}">
+                <i class="fas fa-cocktail"></i>
+                <a href="/drinks" class="text-white {% if request.path == '/drinks' %}font-bold{% endif %}">Drinks</a>
             </li>
-            <li class="flex items-center space-x-2 hover:text-indigo-400">
-                <i class="fas fa-map-marker-alt text-white"></i>
-                <a href="/location" class="text-white">Location</a>
+            <li class="flex items-center space-x-2 hover:text-indigo-400 {% if request.path == '/location' %}active{% endif %}">
+                <i class="fas fa-map-marker-alt"></i>
+                <a href="/location" class="text-white {% if request.path == '/location' %}font-bold{% endif %}">Location</a>
             </li>
         </ul>
     </nav>
