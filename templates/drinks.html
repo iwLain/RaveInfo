@@ -31,7 +31,7 @@
 </div>
 
 <!-- Popup for entering amount of orders -->
-<div id="popup" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden z-40">
+<div id="popup" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden z-40" style="display: none;">
     <div class="bg-gray-800 p-5 rounded-lg shadow-lg text-white">
         <h2 id="popup-drink-name" class="text-2xl mb-4"></h2>
         <p id="popup-drink-amount" class="mb-4"></p>
@@ -44,7 +44,7 @@
 </div>
 
 <!-- Fullscreen overlay for selected drinks -->
-<div id="fullscreen-overlay" class="fixed inset-0 bg-black bg-opacity-90 text-white flex flex-col justify-center items-center hidden z-50 p-4">
+<div id="fullscreen-overlay" class="fixed inset-0 bg-black bg-opacity-90 text-white flex flex-col justify-center items-center hidden z-50 p-4" style="display: none;">
     <button id="close-overlay" class="absolute top-5 right-5 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
         Close
     </button>
@@ -88,12 +88,14 @@ document.addEventListener("DOMContentLoaded", function() {
                 popupDrinkAmount.textContent = `Volume: ${currentDrink.amount}`;
                 orderAmountInput.value = 1;
                 popup.classList.remove("hidden");
+                popup.style.display = "flex"; // Explicitly set display to flex
             }
         });
     });
 
     popupCancelBtn.addEventListener("click", function() {
         popup.classList.add("hidden");
+        popup.style.display = "none"; // Explicitly set display to none
     });
 
     popupConfirmBtn.addEventListener("click", function() {
@@ -106,6 +108,7 @@ document.addEventListener("DOMContentLoaded", function() {
             });
             currentDrink.element.querySelector(".drink-card").classList.add("bg-orange-500");
             popup.classList.add("hidden");
+            popup.style.display = "none"; // Explicitly set display to none
             updateCurrentOrder();
         }
     });
@@ -119,11 +122,13 @@ document.addEventListener("DOMContentLoaded", function() {
                 selectedDrinksDiv.appendChild(drinkElement);
             });
             fullscreenOverlay.classList.remove("hidden");
+            fullscreenOverlay.style.display = "flex"; // Explicitly set display to flex
         }
     });
 
     closeOverlayBtn.addEventListener("click", function() {
         fullscreenOverlay.classList.add("hidden");
+        fullscreenOverlay.style.display = "none"; // Explicitly set display to none
     });
 });
 </script>

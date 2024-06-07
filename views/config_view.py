@@ -1,13 +1,7 @@
-import logging
 from flask import render_template, request, redirect, url_for, flash, session
 from app import app, config, CONFIG_FILE
 from utils import ensure_sections, parse_dj_details, allowed_file, save_password
 import configparser
-from werkzeug.utils import secure_filename
-import os
-
-# Configure logging
-logging.basicConfig(level=logging.DEBUG)
 
 @app.route('/config', methods=['GET', 'POST'])
 def config_page():
@@ -15,7 +9,7 @@ def config_page():
         return redirect(url_for('login'))
 
     ensure_sections()
-    editable_sections = ['DJ SCHEDULE', 'DRINKS', 'HOME', 'LOCATION', 'ADMIN']
+    editable_sections = ['DJ SCHEDULE', 'DRINKS', 'HOME', 'LOCATION', 'TICKETS', 'ADMIN']
 
     if request.method == 'POST':
         try:
@@ -25,11 +19,9 @@ def config_page():
             flash('Configuration updated successfully.')
         except Exception as e:
             flash(f"Error processing request: {e}")
-            logging.error(f"Error processing request: {e}")
         return redirect(url_for('config_page'))
 
     context = load_context()
-    logging.debug(f"Context: {context}")
     return render_template('config.html', **context)
 
 
@@ -57,6 +49,8 @@ def save_configurations(request, editable_sections):
             update_home(request)
         elif section == 'LOCATION':
             update_location(request)
+        elif section == 'TICKETS':
+            update_tickets(request)
         elif section == 'ADMIN':
             update_admin_password(request)
 
@@ -115,6 +109,11 @@ def update_location(request):
     config.set('LOCATION', 'link', location_link)
 
 
+def update_tickets(request):
+    tickets_link = request.form.get('tickets-link', '')
+    config.set('TICKETS', 'link', tickets_link)
+
+
 def update_admin_password(request):
     new_password = request.form.get('admin-password', '')
     if new_password:
@@ -158,49 +157,44 @@ def clear_configurations():
     config.set('HOME', 'image', 'event.png')
     config.add_section('LOCATION')
     config.set('LOCATION', 'link', '')
+    config.add_section('TICKETS')
+    config.set('TICKETS', 'link', '')
 
 
 def load_context():
     dj_config = load_section_config('DJ SCHEDULE', parse_dj_details)
-    drinks_config = load_section_config('DRINKS', lambda x: x)
+    drinks_config = load_section_config('DRINKS', lambda x: x.split(', '))
     home_text = load_option('HOME', 'text', 'Welcome to our event!')
     home_image = load_option('HOME', 'image', 'event.png')
     location_link = load_option('LOCATION', 'link', '')
+    tickets_link = load_option('TICKETS', 'link', '')
     sections = config.sections()
-    logging.debug(f"Sections: {sections}")
     return {
         'dj_config': dj_config,
         'drinks_config': drinks_config,
         'sections': sections,
         'home_text': home_text,
         'home_image': home_image,
-        'location_link': location_link
+        'location_link': location_link,
+        'tickets_link': tickets_link,
     }
 
 
 def load_section_config(section, parse_function):
     try:
-        items = {key: parse_function(value.split(', ')) for key, value in config.items(section)}
-        logging.debug(f"Loaded {section}: {items}")
-        return items
+        return {key: parse_function(value.split(', ')) for key, value in config.items(section)}
     except configparser.NoSectionError:
-        logging.warning(f"No section: {section}")
         return {}
     except Exception as e:
         flash(f"Error loading {section}: {e}")
-        logging.error(f"Error loading {section}: {e}")
         return {}
 
 
 def load_option(section, option, default):
     try:
-        value = config.get(section, option)
-        logging.debug(f"Loaded {section} {option}: {value}")
-        return value
+        return config.get(section, option)
     except configparser.NoOptionError:
-        logging.warning(f"No option: {section} {option}")
         return default
     except Exception as e:
         flash(f"Error loading {section} {option}: {e}")
-        logging.error(f"Error loading {section} {option}: {e}")
         return default
