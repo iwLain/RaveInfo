@@ -1,7 +1,13 @@
+import logging
 from flask import render_template, request, redirect, url_for, flash, session
 from app import app, config, CONFIG_FILE
 from utils import ensure_sections, parse_dj_details, allowed_file, save_password
 import configparser
+from werkzeug.utils import secure_filename
+import os
+
+# Configure logging
+logging.basicConfig(level=logging.DEBUG)
 
 @app.route('/config', methods=['GET', 'POST'])
 def config_page():
@@ -19,9 +25,11 @@ def config_page():
             flash('Configuration updated successfully.')
         except Exception as e:
             flash(f"Error processing request: {e}")
+            logging.error(f"Error processing request: {e}")
         return redirect(url_for('config_page'))
 
     context = load_context()
+    logging.debug(f"Context: {context}")
     return render_template('config.html', **context)
 
 
@@ -79,6 +87,11 @@ def update_drinks(request, section):
                     drinks_to_update[drink_name][1] = value
                 else:
                     drinks_to_update[drink_name].append(value)
+            elif field == 'category':
+                if len(drinks_to_update[drink_name]) > 2:
+                    drinks_to_update[drink_name][2] = value
+                else:
+                    drinks_to_update[drink_name].append(value)
     for drink_name, details in drinks_to_update.items():
         config.set(section, drink_name, ', '.join(details))
 
@@ -129,7 +142,8 @@ def add_drink(request):
     new_drink_name = request.form.get('new-drink-name', '')
     new_drink_price = request.form.get('new-drink-price', '')
     new_drink_amount = request.form.get('new-drink-amount', '')
-    drink_details = ', '.join(filter(None, [new_drink_price, new_drink_amount]))
+    new_drink_category = request.form.get('new-drink-category', 'Other')
+    drink_details = ', '.join(filter(None, [new_drink_price, new_drink_amount, new_drink_category]))
     config.set('DRINKS', new_drink_name, drink_details)
 
 
@@ -148,11 +162,12 @@ def clear_configurations():
 
 def load_context():
     dj_config = load_section_config('DJ SCHEDULE', parse_dj_details)
-    drinks_config = load_section_config('DRINKS', lambda x: x.split(', '))
+    drinks_config = load_section_config('DRINKS', lambda x: x)
     home_text = load_option('HOME', 'text', 'Welcome to our event!')
     home_image = load_option('HOME', 'image', 'event.png')
     location_link = load_option('LOCATION', 'link', '')
     sections = config.sections()
+    logging.debug(f"Sections: {sections}")
     return {
         'dj_config': dj_config,
         'drinks_config': drinks_config,
@@ -165,19 +180,27 @@ def load_context():
 
 def load_section_config(section, parse_function):
     try:
-        return {key: parse_function(value.split(', ')) for key, value in config.items(section)}
+        items = {key: parse_function(value.split(', ')) for key, value in config.items(section)}
+        logging.debug(f"Loaded {section}: {items}")
+        return items
     except configparser.NoSectionError:
+        logging.warning(f"No section: {section}")
         return {}
     except Exception as e:
         flash(f"Error loading {section}: {e}")
+        logging.error(f"Error loading {section}: {e}")
         return {}
 
 
 def load_option(section, option, default):
     try:
-        return config.get(section, option)
+        value = config.get(section, option)
+        logging.debug(f"Loaded {section} {option}: {value}")
+        return value
     except configparser.NoOptionError:
+        logging.warning(f"No option: {section} {option}")
         return default
     except Exception as e:
         flash(f"Error loading {section} {option}: {e}")
+        logging.error(f"Error loading {section} {option}: {e}")
         return default
