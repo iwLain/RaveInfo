@@ -11,7 +11,7 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def save_password(password):
-    hashed = bcrypt.generate_password_hash(password).decode('utf-8')
+    hashed = Bcrypt.generate_password_hash(password).decode('utf-8')
     with open(PASSWORD_FILE, 'w') as f:
         f.write(hashed)
 
@@ -19,7 +19,7 @@ def check_password(password):
     try:
         with open(PASSWORD_FILE, 'r') as f:
             hashed = f.read()
-        return bcrypt.check_password_hash(hashed, password)
+        return Bcrypt.check_password_hash(hashed, password)
     except FileNotFoundError:
         return False
 
