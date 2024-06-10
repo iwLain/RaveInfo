@@ -6,12 +6,13 @@ from collections import OrderedDict
 from app import app, config, PASSWORD_FILE, CONFIG_FILE
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+bcrypt = Bcrypt(app)
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def save_password(password):
-    hashed = Bcrypt.generate_password_hash(password).decode('utf-8')
+    hashed = bcrypt.generate_password_hash(password).decode('utf-8')
     with open(PASSWORD_FILE, 'w') as f:
         f.write(hashed)
 
@@ -19,7 +20,7 @@ def check_password(password):
     try:
         with open(PASSWORD_FILE, 'r') as f:
             hashed = f.read()
-        return Bcrypt.check_password_hash(hashed, password)
+        return bcrypt.check_password_hash(hashed, password)
     except FileNotFoundError:
         return False
 
@@ -48,3 +49,7 @@ def ensure_sections():
         config.set('LOCATION', 'link', '')
     with open(CONFIG_FILE, 'w') as configfile:
         config.write(configfile)
+
+def ensure_default_password():
+    if not os.path.exists(PASSWORD_FILE):
+        save_password('rave24')

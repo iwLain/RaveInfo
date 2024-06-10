@@ -44,5 +44,8 @@ import views.config_view
 import views.uploaded_file_view  # Ensure this is imported
 from utils import *
 
-if not os.path.exists(PASSWORD_FILE):
-    save_password('admin')  # Set a default password if none exists
+# Ensure the default password is saved if it doesn't exist
+ensure_default_password()
+
+if __name__ == '__main__':
+    app.run(debug=True)
