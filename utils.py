@@ -37,7 +37,7 @@ def parse_dj_details(details):
     return parsed
 
 def ensure_sections():
-    sections = ['DJ SCHEDULE', 'DRINKS', 'HOME', 'LOCATION', 'ADMIN']
+    sections = ['DJ SCHEDULE', 'DRINKS', 'HOME', 'LOCATION', 'TICKETS', 'ADMIN']
     for section in sections:
         if section not in config.sections():
             config.add_section(section)
@@ -47,6 +47,8 @@ def ensure_sections():
         config.set('HOME', 'image', 'event.png')
     if 'link' not in config['LOCATION']:
         config.set('LOCATION', 'link', '')
+    if 'link' not in config['TICKETS']:
+        config.set('TICKETS', 'link', 'https://example.com/tickets')
     with open(CONFIG_FILE, 'w') as configfile:
         config.write(configfile)
 

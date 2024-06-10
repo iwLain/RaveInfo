@@ -34,6 +34,10 @@
                 <i class="fas fa-map-marker-alt"></i>
                 <a href="/location" class="text-white {% if request.path == '/location' %}font-bold{% endif %}">Location</a>
             </li>
+            <li class="flex items-center space-x-2 hover:text-indigo-400 {% if request.path == '/tickets' %}active{% endif %}">
+                <i class="fas fa-ticket-alt"></i>
+                <a href="{{ tickets_link }}" class="text-white {% if request.path == '/tickets' %}font-bold{% endif %}">Tickets</a>
+            </li>
         </ul>
     </nav>
     <main class="flex justify-center w-full flex-grow">
@@ -51,6 +55,13 @@
                 <i class="fas fa-user-shield"></i> Admin Area
             </a>
         </div>
+        {% if session.get('logged_in') %}
+        <div class="mt-4">
+            <a href="/logout" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                Logout
+            </a>
+        </div>
+        {% endif %}
     </footer>
     <script>
         // JavaScript to add opacity transition on page load

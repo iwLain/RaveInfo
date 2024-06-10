@@ -10,11 +10,10 @@ def login():
             session['logged_in'] = True
             return redirect(url_for('config_page'))
         else:
-            flash('Invalid password.')
+            flash('Invalid password')
     return render_template('login.html')
 
 @app.route('/logout')
 def logout():
     session.pop('logged_in', None)
-    flash('You were logged out.')
     return redirect(url_for('login'))

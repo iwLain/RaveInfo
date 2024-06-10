@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, g
 from flask_bcrypt import Bcrypt
 import os
 import configparser
@@ -46,6 +46,13 @@ from utils import *
 
 # Ensure the default password is saved if it doesn't exist
 ensure_default_password()
+# Ensure configuration sections are initialized
+ensure_sections()
+
+@app.context_processor
+def inject_ticket_link():
+    tickets_link = config.get('TICKETS', 'link', fallback='https://example.com/tickets')
+    return dict(tickets_link=tickets_link)
 
 if __name__ == '__main__':
     app.run(debug=True)
