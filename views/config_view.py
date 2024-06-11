@@ -67,7 +67,7 @@ def update_dj_schedule(request, section):
                 djs_to_update[dj_name] = parse_dj_details(config.get(section, dj_name).split(', '))
             djs_to_update[dj_name][field] = value
     for dj_name, details in djs_to_update.items():
-        config.set(section, dj_name, ', '.join(filter(None, details.values())))
+        config.set(section, dj_name, ', '.join(details.values()))
 
 
 def update_drinks(request, section):
@@ -90,7 +90,7 @@ def update_drinks(request, section):
                 else:
                     drinks_to_update[drink_name].append(value)
     for drink_name, details in drinks_to_update.items():
-        config.set(section, drink_name, ', '.join(filter(None, details)))
+        config.set(section, drink_name, ', '.join(details))
 
 
 def update_home(request):
