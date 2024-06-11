@@ -27,17 +27,27 @@ WORKDIR /app
 COPY --from=build /app /app
 
 # Install runtime dependencies
-RUN apk add --no-cache libstdc++
+RUN apk add --no-cache libstdc++ libffi openssl
+
+# Install gunicorn
+RUN pip install --no-cache-dir gunicorn
 
 # Install Python packages from requirements.txt (copied from build stage)
 COPY --from=build /usr/local/lib/python3.8/site-packages /usr/local/lib/python3.8/site-packages
 COPY --from=build /usr/local/bin /usr/local/bin
 
+# Remove build dependencies to reduce image size
+RUN apk del gcc musl-dev
+
 # Clean up unnecessary files to keep the image size small
 RUN rm -rf /var/cache/apk/* /root/.cache /tmp/* /usr/share/man /usr/share/doc /usr/include /app/node_modules /app/package.json /app/package-lock.json /app/webpack.config.js
+
+# Set environment variables for production
+ENV FLASK_ENV=production
+ENV PYTHONUNBUFFERED=1
 
 # Make port 5000 available to the world outside this container
 EXPOSE 5000
 
-# Run app.py when the container launches
-CMD ["python", "run.py"]
+# Run gunicorn server when the container launches
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "run:app"]
