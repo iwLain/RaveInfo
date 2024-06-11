@@ -10,7 +10,7 @@
 <body class="bg-gray-900 text-white flex flex-col min-h-screen">
     <nav class="bg-gray-800 p-4">
         <div class="container mx-auto flex justify-between items-center">
-            <div class="text-white text-2xl font-bold">
+            <div class="text-white text-2xl font-bold lg:hidden">
                 <a href="/">RaveInfo</a>
             </div>
             <div class="lg:hidden">
@@ -18,7 +18,7 @@
                     <i class="fas fa-bars"></i>
                 </button>
             </div>
-            <ul class="hidden lg:flex lg:items-center lg:space-x-8">
+            <ul class="hidden lg:flex lg:items-center lg:space-x-8 lg:w-full lg:justify-center text-left">
                 <li class="hover:text-indigo-400 {% if request.path == '/' %}text-indigo-400{% endif %}">
                     <a href="/" class="flex items-center space-x-2">
                         <i class="fas fa-home"></i>
@@ -51,7 +51,7 @@
                 </li>
             </ul>
         </div>
-        <ul id="nav-menu" class="hidden lg:hidden bg-gray-800 w-full space-y-2 p-4">
+        <ul id="nav-menu" class="hidden lg:hidden bg-gray-800 w-full space-y-2 p-4 text-left">
             <li class="hover:text-indigo-400 {% if request.path == '/' %}text-indigo-400{% endif %}">
                 <a href="/" class="flex items-center space-x-2">
                     <i class="fas fa-home"></i>

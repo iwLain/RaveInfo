@@ -37,7 +37,7 @@ def parse_dj_details(details):
     return parsed
 
 def ensure_sections():
-    sections = ['DJ SCHEDULE', 'DRINKS', 'HOME', 'LOCATION', 'TICKETS', 'ADMIN']
+    sections = ['FLASK', 'DJ SCHEDULE', 'DRINKS', 'HOME', 'LOCATION', 'TICKETS', 'ADMIN']
     for section in sections:
         if section not in config.sections():
             config.add_section(section)

@@ -1,6 +1,6 @@
 from flask import render_template, request, redirect, url_for, flash, session
 from app import app, config, CONFIG_FILE
-from utils import ensure_sections, parse_dj_details, allowed_file, save_password
+from utils import ensure_sections, parse_dj_details, allowed_file, save_password, secure_filename
 import configparser
 
 @app.route('/config', methods=['GET', 'POST'])
@@ -11,7 +11,9 @@ def config_page():
     ensure_sections()
     editable_sections = ['DJ SCHEDULE', 'DRINKS', 'HOME', 'LOCATION', 'TICKETS', 'ADMIN']
 
+    active_tab = request.args.get('tab', 'dj-schedule')
     if request.method == 'POST':
+        active_tab = request.form.get('active-tab', 'dj-schedule')
         try:
             handle_post_request(request, editable_sections)
             with open(CONFIG_FILE, 'w') as configfile:
@@ -19,9 +21,10 @@ def config_page():
             flash('Configuration updated successfully.')
         except Exception as e:
             flash(f"Error processing request: {e}")
-        return redirect(url_for('config_page'))
+        return redirect(url_for('config_page', tab=active_tab))
 
     context = load_context()
+    context['active_tab'] = active_tab
     return render_template('config.html', **context)
 
 
@@ -163,7 +166,11 @@ def clear_configurations():
 
 def load_context():
     dj_config = load_section_config('DJ SCHEDULE', parse_dj_details)
-    drinks_config = load_section_config('DRINKS', lambda x: x.split(', '))
+    drinks_config = load_section_config('DRINKS', lambda x: {
+        'price': x[0] if len(x) > 0 else '0',
+        'amount': x[1] if len(x) > 1 else '',
+        'category': x[2] if len(x) > 2 else 'Other'
+    })
     home_text = load_option('HOME', 'text', 'Welcome to our event!')
     home_image = load_option('HOME', 'image', 'event.png')
     location_link = load_option('LOCATION', 'link', '')

@@ -2,187 +2,243 @@
 
 {% block content %}
 <div class="flex flex-col justify-center items-center min-h-screen bg-gray-900 py-6">
-    <form method="post" enctype="multipart/form-data" class="space-y-10 w-10/12 max-w-4xl bg-gray-800 p-10 rounded-lg shadow-lg">
-        {% for section in sections %}
-            <div class="mb-12 w-full text-center">
-                <h2 class="text-3xl font-bold text-center text-white mb-6">{{ section }}</h2>
-                {% if section == 'DJ SCHEDULE' %}
-                    <div class="overflow-x-auto mx-auto w-full">
-                        <table class="min-w-full divide-y divide-gray-700 mb-6">
-                            <thead class="bg-gray-700">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Name</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Time</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Genre</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Soundcloud</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Instagram</th>
-                                    <th class="px-6 py-3 relative">
-                                        <span class="sr-only">Action</span>
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-gray-800 divide-y divide-gray-700">
-                                {% if dj_config %}
-                                    {% for dj, details in dj_config.items() %}
-                                        <tr>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <input name="DJ SCHEDULE-{{ dj }}" value="{{ dj }}" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 w-full p-2" readonly>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <input type="time" name="DJ SCHEDULE-{{ dj }}-time" value="{{ details['time'] }}" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 w-full p-2">
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <input name="DJ SCHEDULE-{{ dj }}-genre" value="{{ details['genre'] }}" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 w-full p-2">
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <input name="DJ SCHEDULE-{{ dj }}-soundcloud" value="{{ details['soundcloud'] }}" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 w-full p-2">
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <input name="DJ SCHEDULE-{{ dj }}-instagram" value="{{ details['instagram'] }}" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 w-full p-2">
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                <button type="submit" name="action" value="delete" class="text-red-600 hover:text-red-900">
-                                                    <input type="hidden" name="delete" value="DJ SCHEDULE-{{ dj }}">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    {% endfor %}
-                                {% else %}
+    <div class="w-10/12 max-w-4xl bg-gray-800 p-10 rounded-lg shadow-lg">
+        <ul class="flex border-b mb-4">
+            <li class="mr-1">
+                <a class="bg-gray-800 inline-block border-l border-t border-r rounded-t py-2 px-4 text-white hover:bg-gray-700 {% if active_tab == 'dj-schedule' %}bg-gray-700{% endif %}" href="#dj-schedule" data-tab="dj-schedule">DJ Schedule</a>
+            </li>
+            <li class="mr-1">
+                <a class="bg-gray-800 inline-block border-l border-t border-r rounded-t py-2 px-4 text-white hover:bg-gray-700 {% if active_tab == 'drinks' %}bg-gray-700{% endif %}" href="#drinks" data-tab="drinks">Drinks</a>
+            </li>
+            <li class="mr-1">
+                <a class="bg-gray-800 inline-block border-l border-t border-r rounded-t py-2 px-4 text-white hover:bg-gray-700 {% if active_tab == 'home' %}bg-gray-700{% endif %}" href="#home" data-tab="home">Home</a>
+            </li>
+            <li class="mr-1">
+                <a class="bg-gray-800 inline-block border-l border-t border-r rounded-t py-2 px-4 text-white hover:bg-gray-700 {% if active_tab == 'location' %}bg-gray-700{% endif %}" href="#location" data-tab="location">Location</a>
+            </li>
+            <li class="mr-1">
+                <a class="bg-gray-800 inline-block border-l border-t border-r rounded-t py-2 px-4 text-white hover:bg-gray-700 {% if active_tab == 'tickets' %}bg-gray-700{% endif %}" href="#tickets" data-tab="tickets">Tickets</a>
+            </li>
+            <li class="mr-1">
+                <a class="bg-gray-800 inline-block border-l border-t border-r rounded-t py-2 px-4 text-white hover:bg-gray-700 {% if active_tab == 'admin' %}bg-gray-700{% endif %}" href="#admin" data-tab="admin">Admin</a>
+            </li>
+        </ul>
+        <form method="post" enctype="multipart/form-data">
+            <input type="hidden" name="active-tab" id="active-tab" value="{{ active_tab }}">
+            <div id="dj-schedule" class="tab-content {% if active_tab != 'dj-schedule' %}hidden{% endif %}">
+                <h2 class="text-3xl font-bold text-center text-white mb-6">DJ Schedule</h2>
+                <div class="overflow-x-auto mx-auto w-full">
+                    <table class="min-w-full divide-y divide-gray-700 mb-6">
+                        <thead class="bg-gray-700">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Name</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Time</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Genre</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Soundcloud</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Instagram</th>
+                                <th class="px-6 py-3 relative">
+                                    <span class="sr-only">Action</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-gray-800 divide-y divide-gray-700">
+                            {% if dj_config %}
+                                {% for dj, details in dj_config.items() %}
                                     <tr>
-                                        <td colspan="6" class="px-6 py-4 whitespace-nowrap text-center text-gray-500">
-                                            No DJs scheduled.
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <input name="DJ SCHEDULE-{{ dj }}" value="{{ dj }}" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 w-full p-2" readonly>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <input type="time" name="DJ SCHEDULE-{{ dj }}-time" value="{{ details['time'] }}" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 w-full p-2">
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <input name="DJ SCHEDULE-{{ dj }}-genre" value="{{ details['genre'] }}" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 w-full p-2">
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap overflow-auto">
+                                            <input name="DJ SCHEDULE-{{ dj }}-soundcloud" value="{{ details['soundcloud'] }}" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 w-full p-2">
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap overflow-auto">
+                                            <input name="DJ SCHEDULE-{{ dj }}-instagram" value="{{ details['instagram'] }}" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 w-full p-2">
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <button type="submit" name="action" value="delete" class="text-red-600 hover:text-red-900">
+                                                <input type="hidden" name="delete" value="DJ SCHEDULE-{{ dj }}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
                                         </td>
                                     </tr>
-                                {% endif %}
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="mt-8">
-                        <h3 class="text-2xl font-semibold text-center text-white mb-4">Add New DJ</h3>
-                        <div class="flex flex-wrap justify-center gap-4">
-                            <input name="new-dj-name" placeholder="Name" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 p-2 flex-grow">
-                            <input type="time" name="new-dj-time" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 p-2 flex-grow">
-                            <input name="new-dj-genre" placeholder="Genre" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 p-2 flex-grow">
-                            <input name="new-dj-soundcloud" placeholder="Soundcloud (optional)" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 p-2 flex-grow">
-                            <input name="new-dj-instagram" placeholder="Instagram (optional)" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 p-2 flex-grow">
-                        </div>
-                        <div class="flex justify-center mt-6">
-                            <button type="submit" name="action" value="add-dj" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                                <i class="fas fa-plus"></i> Add DJ
-                            </button>
-                        </div>
-                    </div>
-                {% elif section == 'DRINKS' %}
-                    <div class="overflow-x-auto mx-auto w-full">
-                        <table class="min-w-full divide-y divide-gray-700 mb-6">
-                            <thead class="bg-gray-700">
+                                {% endfor %}
+                            {% else %}
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Drink</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Amount</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Price</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Category</th>
-                                    <th class="px-6 py-3 relative">
-                                        <span class="sr-only">Action</span>
-                                    </th>
+                                    <td colspan="6" class="px-6 py-4 whitespace-nowrap text-center text-gray-500">
+                                        No DJs scheduled.
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody class="bg-gray-800 divide-y divide-gray-700">
-                                {% if drinks_config %}
-                                    {% for drink, details in drinks_config.items() %}
-                                        <tr>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <input name="DRINKS-{{ drink }}" value="{{ drink }}" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 w-full p-2">
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <input name="DRINKS-{{ drink }}-amount" value="{{ details[1] if details|length > 1 else '' }}" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 w-full p-2">
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <input name="DRINKS-{{ drink }}-price" value="{{ details[0] }}" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 w-full p-2">
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <input name="DRINKS-{{ drink }}-category" value="{{ details[2] if details|length > 2 else 'Other' }}" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 w-full p-2">
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                <button type="submit" name="action" value="delete" class="text-red-600 hover:text-red-900">
-                                                    <input type="hidden" name="delete" value="DRINKS-{{ drink }}">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    {% endfor %}
-                                {% else %}
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-8">
+                    <h3 class="text-2xl font-semibold text-center text-white mb-4">Add New DJ</h3>
+                    <div class="flex flex-wrap justify-center gap-4">
+                        <input name="new-dj-name" placeholder="Name" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 p-2 flex-grow">
+                        <input type="time" name="new-dj-time" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 p-2 flex-grow">
+                        <input name="new-dj-genre" placeholder="Genre" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 p-2 flex-grow">
+                        <input name="new-dj-soundcloud" placeholder="Soundcloud (optional)" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 p-2 flex-grow">
+                        <input name="new-dj-instagram" placeholder="Instagram (optional)" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 p-2 flex-grow">
+                    </div>
+                    <div class="flex justify-center mt-6">
+                        <button type="submit" name="action" value="add-dj" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                            <i class="fas fa-plus"></i> Add DJ
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div id="drinks" class="tab-content {% if active_tab != 'drinks' %}hidden{% endif %}">
+                <h2 class="text-3xl font-bold text-center text-white mb-6">Drinks</h2>
+                <div class="overflow-x-auto mx-auto w-full">
+                    <table class="min-w-full divide-y divide-gray-700 mb-6">
+                        <thead class="bg-gray-700">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Drink</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Amount</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Price</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Category</th>
+                                <th class="px-6 py-3 relative">
+                                    <span class="sr-only">Action</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-gray-800 divide-y divide-gray-700">
+                            {% if drinks_config %}
+                                {% for drink, details in drinks_config.items() %}
                                     <tr>
-                                        <td colspan="5" class="px-6 py-4 whitespace-nowrap text-center text-gray-500">
-                                            No drinks available.
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <input name="DRINKS-{{ drink }}" value="{{ drink }}" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 w-full p-2">
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <input name="DRINKS-{{ drink }}-amount" value="{{ details.amount }}" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 w-full p-2">
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <input name="DRINKS-{{ drink }}-price" value="{{ details.price }}" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 w-full p-2">
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <input name="DRINKS-{{ drink }}-category" value="{{ details.category }}" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 w-full p-2">
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <button type="submit" name="action" value="delete" class="text-red-600 hover:text-red-900">
+                                                <input type="hidden" name="delete" value="DRINKS-{{ drink }}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
                                         </td>
                                     </tr>
-                                {% endif %}
-                            </tbody>
-                        </table>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="5" class="px-6 py-4 whitespace-nowrap text-center text-gray-500">
+                                        No drinks available.
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-8">
+                    <h3 class="text-2xl font-semibold text-center text-white mb-4">Add New Drink</h3>
+                    <div class="flex flex-wrap justify-center gap-4">
+                        <input name="new-drink-name" placeholder="Name" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 p-2 flex-grow">
+                        <input name="new-drink-amount" placeholder="Amount" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 p-2 flex-grow">
+                        <input name="new-drink-price" placeholder="Price" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 p-2 flex-grow">
+                        <input name="new-drink-category" placeholder="Category" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 p-2 flex-grow">
+                    </div>
+                    <div class="flex justify-center mt-6">
+                        <button type="submit" name="action" value="add-drink" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                            <i class="fas fa-plus"></i> Add Drink
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div id="home" class="tab-content {% if active_tab != 'home' %}hidden{% endif %}">
+                <h2 class="text-3xl font-bold text-center text-white mb-6">Home</h2>
+                <div class="mt-8">
+                    <h3 class="text-2xl font-semibold text-center text-white mb-4">Edit Home Text</h3>
+                    <div class="flex justify-center w-full">
+                        <textarea name="home-text" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 p-4 w-full max-w-4xl" rows="4">{{ home_text }}</textarea>
                     </div>
                     <div class="mt-8">
-                        <h3 class="text-2xl font-semibold text-center text-white mb-4">Add New Drink</h3>
-                        <div class="flex flex-wrap justify-center gap-4">
-                            <input name="new-drink-name" placeholder="Name" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 p-2 flex-grow">
-                            <input name="new-drink-amount" placeholder="Amount" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 p-2 flex-grow">
-                            <input name="new-drink-price" placeholder="Price" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 p-2 flex-grow">
-                            <input name="new-drink-category" placeholder="Category" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 p-2 flex-grow">
-                        </div>
-                        <div class="flex justify-center mt-6">
-                            <button type="submit" name="action" value="add-drink" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                                <i class="fas fa-plus"></i> Add Drink
-                            </button>
-                        </div>
-                    </div>
-                {% elif section == 'HOME' %}
-                    <div class="mt-8">
-                        <h3 class="text-2xl font-semibold text-center text-white mb-4">Edit Home Text</h3>
+                        <h3 class="text-2xl font-semibold text-center text-white mb-4">Upload Home Image</h3>
                         <div class="flex justify-center w-full">
-                            <textarea name="home-text" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 p-4 w-full max-w-4xl" rows="4">{{ home_text }}</textarea>
+                            <input type="file" name="home-image" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 p-2 w-full max-w-4xl">
                         </div>
                         <div class="mt-8">
-                            <h3 class="text-2xl font-semibold text-center text-white mb-4">Upload Home Image</h3>
-                            <div class="flex justify-center w-full">
-                                <input type="file" name="home-image" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 p-2 w-full max-w-4xl">
-                            </div>
-                            <div class="mt-8">
-                                <img src="{{ url_for('uploaded_file', filename=home_image) }}" alt="Home Image" class="max-w-md mx-auto object-contain">
-                            </div>
+                            <img src="{{ url_for('uploaded_file', filename=home_image) }}" alt="Home Image" class="max-w-full h-auto mx-auto object-contain">
                         </div>
                     </div>
-                {% elif section == 'LOCATION' %}
-                    <div class="mt-8">
-                        <h3 class="text-2xl font-semibold text-center text-white mb-4">Edit Location Link</h3>
-                        <div class="flex justify-center w-full">
-                            <input name="location-link" value="{{ location_link }}" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 p-4 w-full max-w-4xl">
-                        </div>
-                    </div>
-                {% elif section == 'TICKETS' %}
-                    <div class="mt-8">
-                        <h3 class="text-2xl font-semibold text-center text-white mb-4">Edit Tickets Link</h3>
-                        <div class="flex justify-center w-full">
-                            <input name="tickets-link" value="{{ tickets_link }}" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 p-4 w-full max-w-4xl">
-                        </div>
-                    </div>
-                {% elif section == 'ADMIN' %}
-                    <div class="mt-8">
-                        <h3 class="text-2xl font-semibold text-center text-white mb-4">Change Admin Password</h3>
-                        <div class="flex justify-center w-full">
-                            <input type="password" name="admin-password" placeholder="New Password" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 p-4 w-full max-w-4xl">
-                        </div>
-                    </div>
-                {% endif %}
+                </div>
             </div>
-        {% endfor %}
-        <div class="flex justify-center space-x-4 mt-10">
-            <button type="submit" name="action" value="save" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
-                <i class="fas fa-save"></i> Save
-            </button>
-            <button type="submit" name="action" value="clear" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                <i class="fas fa-trash-alt"></i> Clear All
-            </button>
-        </div>
-    </form>
+            <div id="location" class="tab-content {% if active_tab != 'location' %}hidden{% endif %}">
+                <h2 class="text-3xl font-bold text-center text-white mb-6">Location</h2>
+                <div class="mt-8">
+                    <h3 class="text-2xl font-semibold text-center text-white mb-4">Edit Location Link</h3>
+                    <div class="flex justify-center w-full">
+                        <input name="location-link" value="{{ location_link }}" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 p-4 w-full max-w-4xl">
+                    </div>
+                </div>
+            </div>
+            <div id="tickets" class="tab-content {% if active_tab != 'tickets' %}hidden{% endif %}">
+                <h2 class="text-3xl font-bold text-center text-white mb-6">Tickets</h2>
+                <div class="mt-8">
+                    <h3 class="text-2xl font-semibold text-center text-white mb-4">Edit Tickets Link</h3>
+                    <div class="flex justify-center w-full">
+                        <input name="tickets-link" value="{{ tickets_link }}" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 p-4 w-full max-w-4xl">
+                    </div>
+                </div>
+            </div>
+            <div id="admin" class="tab-content {% if active_tab != 'admin' %}hidden{% endif %}">
+                <h2 class="text-3xl font-bold text-center text-white mb-6">Admin</h2>
+                <div class="mt-8">
+                    <h3 class="text-2xl font-semibold text-center text-white mb-4">Change Admin Password</h3>
+                    <div class="flex justify-center w-full">
+                        <input type="password" name="admin-password" placeholder="New Password" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 p-4 w-full max-w-4xl">
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-center space-x-4 mt-10">
+                <button type="submit" name="action" value="save" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
+                    <i class="fas fa-save"></i> Save
+                </button>
+                <button type="submit" name="action" value="clear" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                    <i class="fas fa-trash-alt"></i> Clear All
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const tabs = document.querySelectorAll('[data-tab]');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const activeTabInput = document.getElementById('active-tab');
+        
+        function showTab(tabId) {
+            tabContents.forEach(tc => tc.classList.add('hidden'));
+            tabs.forEach(t => t.classList.remove('bg-gray-700'));
+            document.getElementById(tabId).classList.remove('hidden');
+            document.querySelector(`[data-tab="${tabId}"]`).classList.add('bg-gray-700');
+        }
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function(event) {
+                event.preventDefault();
+                const target = tab.getAttribute('data-tab');
+                activeTabInput.value = target;
+                showTab(target);
+            });
+        });
+
+        const initialTab = activeTabInput.value || 'dj-schedule';
+        showTab(initialTab);
+    });
+</script>
 {% endblock %}

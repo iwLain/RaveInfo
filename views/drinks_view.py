@@ -14,12 +14,12 @@ def drinks():
             if isinstance(value, str):
                 details = re.findall(r'([^,]+)', value)
                 print(f"Details: {details}")  # Debug print
-                if len(details) >= 2:
+                if len(details) >= 3:
                     drinks.append({
                         'name': key,
-                        'category': details[2].strip() if len(details) > 2 else 'Other',
                         'price': float(details[0].replace('€', '').replace(',', '.').strip()),
-                        'amount': details[1].strip() if len(details) > 1 else 'N/A'
+                        'amount': details[1].strip(),
+                        'category': details[2].strip() if len(details) > 2 else 'Other'
                     })
                 else:
                     print(f"Not enough details for {key}: {details}")  # Debug print
