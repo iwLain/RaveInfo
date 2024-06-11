@@ -43,7 +43,7 @@ COPY --from=build /usr/local/bin /usr/local/bin
 RUN rm -rf /var/cache/apk/* /root/.cache /tmp/* /usr/share/man /usr/share/doc /usr/include /app/node_modules /app/package.json /app/package-lock.json /app/webpack.config.js
 
 # Set environment variables for production
-ENV FLASK_ENV=production
+ENV FLASK_DEBUG=0
 ENV PYTHONUNBUFFERED=1
 
 # Make port 5000 available to the world outside this container
