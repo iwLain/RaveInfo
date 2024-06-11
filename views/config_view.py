@@ -75,8 +75,8 @@ def update_dj_schedule(request, section):
 def update_drinks(request, section):
     drinks_to_update = {}
     for key, value in request.form.items():
-        if key.startswith('DRINKS-') and '-' in key[len('DRINKS-'):]:
-            drink_name, field = key[len('DRINKS-'):].rsplit('-', 1)
+        if key.startswith(f'{section}-') and '-' in key[len(f'{section}-'):]:
+            drink_name, field = key[len(f'{section}-'):].rsplit('-', 1)
             if drink_name not in drinks_to_update:
                 drinks_to_update[drink_name] = config.get(section, drink_name).split(', ')
             if field == 'price':

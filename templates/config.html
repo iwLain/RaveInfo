@@ -100,13 +100,13 @@
                                             <input name="DRINKS-{{ drink }}-name" value="{{ drink }}" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 w-full p-2 auto-resize">
                                         </td>
                                         <td class="px-2 py-4 whitespace-nowrap">
-                                            <input name="DRINKS-{{ drink }}-amount" value="{{ details.amount }}" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 w-full p-2 auto-resize">
+                                            <input name="DRINKS-{{ drink }}-amount" value="{{ details['amount'] }}" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 w-full p-2 auto-resize">
                                         </td>
                                         <td class="px-2 py-4 whitespace-nowrap">
-                                            <input name="DRINKS-{{ drink }}-price" value="{{ details.price }}" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 w-full p-2 auto-resize">
+                                            <input name="DRINKS-{{ drink }}-price" value="{{ details['price'] }}" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 w-full p-2 auto-resize">
                                         </td>
                                         <td class="px-2 py-4 whitespace-nowrap">
-                                            <input name="DRINKS-{{ drink }}-category" value="{{ details.category }}" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 w-full p-2 auto-resize">
+                                            <input name="DRINKS-{{ drink }}-category" value="{{ details['category'] }}" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 w-full p-2 auto-resize">
                                         </td>
                                         <td class="px-2 py-4 whitespace-nowrap text-right text-sm font-medium">
                                             <button type="submit" name="action" value="delete-drink" class="text-red-600 hover:text-red-900">
