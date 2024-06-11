@@ -17,6 +17,9 @@ RUN pip install --no-cache-dir -r requirements.txt && \
 # Run the build script
 RUN npm run build-css
 
+# Remove build dependencies to reduce image size
+RUN apk del gcc musl-dev
+
 # Stage 2: Runtime Stage
 FROM python:3.8-alpine
 
@@ -35,9 +38,6 @@ RUN pip install --no-cache-dir gunicorn
 # Install Python packages from requirements.txt (copied from build stage)
 COPY --from=build /usr/local/lib/python3.8/site-packages /usr/local/lib/python3.8/site-packages
 COPY --from=build /usr/local/bin /usr/local/bin
-
-# Remove build dependencies to reduce image size
-RUN apk del gcc musl-dev
 
 # Clean up unnecessary files to keep the image size small
 RUN rm -rf /var/cache/apk/* /root/.cache /tmp/* /usr/share/man /usr/share/doc /usr/include /app/node_modules /app/package.json /app/package-lock.json /app/webpack.config.js
