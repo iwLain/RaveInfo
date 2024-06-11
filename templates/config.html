@@ -7,10 +7,10 @@
             <ul class="flex flex-wrap text-sm md:text-base">
                 {% for tab in ['dj-schedule', 'drinks', 'home', 'location', 'tickets', 'admin'] %}
                 <li class="mr-1">
-                    <a class="tab-link inline-block py-2 px-4 text-white hover:bg-indigo-600 transition duration-300 ease-in-out relative {% if active_tab == tab %}bg-indigo-500{% else %}bg-gray-700{% endif %}" href="?active_tab={{ tab }}" data-tab="{{ tab }}">
+                    <a class="tab-link inline-block py-2 px-4 text-white hover:bg-indigo-600 transition duration-300 ease-in-out relative {% if active_tab == tab %}bg-indigo-500{% else %}bg-gray-700{% endif %}" href="?tab={{ tab }}" data-tab="{{ tab }}">
                         <i class="fas fa-{{ 'calendar-alt' if tab == 'dj-schedule' else 'cocktail' if tab == 'drinks' else 'home' if tab == 'home' else 'map-marker-alt' if tab == 'location' else 'ticket-alt' if tab == 'tickets' else 'user-shield' }} mr-2"></i> {{ tab|title }}
                         {% if active_tab == tab %}
-                        <span class="absolute bottom-0 left-0 right-0 h-1 bg-indigo-500"></span>
+                        <span class="absolute bottom-0 left-0 right-0 h-1 bg-indigo-500 indicator"></span>
                         {% endif %}
                     </a>
                 </li>
@@ -52,8 +52,8 @@
                                             <input name="DJ SCHEDULE-{{ dj }}-instagram" value="{{ details['instagram'] }}" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 w-full p-2 auto-resize">
                                         </td>
                                         <td class="px-2 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <button type="submit" name="action" value="delete" class="text-red-600 hover:text-red-900">
-                                                <input type="hidden" name="delete" value="DJ SCHEDULE-{{ dj }}">
+                                            <button type="submit" name="action" value="delete-dj" class="text-red-600 hover:text-red-900">
+                                                <input type="hidden" name="delete-dj" value="{{ dj }}">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </td>
@@ -70,9 +70,11 @@
                 <div class="mt-8">
                     <h3 class="text-2xl font-semibold text-center text-white mb-4">Add New DJ</h3>
                     <div class="flex flex-wrap justify-center gap-4">
-                        {% for field in ['name', 'time', 'genre', 'soundcloud', 'instagram'] %}
-                        <input name="new-dj-{{ field }}" placeholder="{{ field|title }}" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 p-2 flex-grow auto-resize">
-                        {% endfor %}
+                        <input name="new-dj-name" placeholder="Name" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 p-2 flex-grow auto-resize">
+                        <input type="time" name="new-dj-time" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 p-2 flex-grow auto-resize">
+                        <input name="new-dj-genre" placeholder="Genre" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 p-2 flex-grow auto-resize">
+                        <input name="new-dj-soundcloud" placeholder="Soundcloud (optional)" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 p-2 flex-grow auto-resize">
+                        <input name="new-dj-instagram" placeholder="Instagram (optional)" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 p-2 flex-grow auto-resize">
                     </div>
                     <div class="flex justify-center mt-6">
                         <button type="submit" name="action" value="add-dj" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out">
@@ -107,8 +109,8 @@
                                             <input name="DRINKS-{{ drink }}-category" value="{{ details.category }}" class="border-gray-600 bg-gray-700 rounded-md text-gray-300 w-full p-2 auto-resize">
                                         </td>
                                         <td class="px-2 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <button type="submit" name="action" value="delete" class="text-red-600 hover:text-red-900">
-                                                <input type="hidden" name="delete" value="DRINKS-{{ drink }}">
+                                            <button type="submit" name="action" value="delete-drink" class="text-red-600 hover:text-red-900">
+                                                <input type="hidden" name="delete-drink" value="{{ drink }}">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </td>
@@ -199,13 +201,14 @@
             tabContents.forEach(tc => tc.classList.add('hidden'));
             tabs.forEach(t => {
                 t.classList.remove('bg-indigo-500');
-                t.querySelector('span')?.remove();
+                const indicator = t.querySelector('.indicator');
+                if (indicator) indicator.remove();
             });
             document.getElementById(tabId).classList.remove('hidden');
             const activeTab = document.querySelector(`[data-tab="${tabId}"]`);
             activeTab.classList.add('bg-indigo-500');
             const indicator = document.createElement('span');
-            indicator.className = 'absolute bottom-0 left-0 right-0 h-1 bg-indigo-500';
+            indicator.className = 'absolute bottom-0 left-0 right-0 h-1 bg-indigo-500 indicator';
             activeTab.appendChild(indicator);
             localStorage.setItem('activeTab', tabId);
         }
@@ -215,12 +218,12 @@
                 event.preventDefault();
                 const target = tab.getAttribute('data-tab');
                 activeTabInput.value = target;
-                window.location.search = `?active_tab=${target}`;
+                window.location.search = `?tab=${target}`;
             });
         });
 
         const urlParams = new URLSearchParams(window.location.search);
-        const initialTab = urlParams.get('active_tab') || localStorage.getItem('activeTab') || 'dj-schedule';
+        const initialTab = urlParams.get('tab') || localStorage.getItem('activeTab') || 'dj-schedule';
         showTab(initialTab);
 
         inputs.forEach(input => {

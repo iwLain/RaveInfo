@@ -55,3 +55,15 @@ def ensure_sections():
 def ensure_default_password():
     if not os.path.exists(PASSWORD_FILE):
         save_password('rave24')
+
+def delete_dj(name):
+    if config.has_option('DJ SCHEDULE', name):
+        config.remove_option('DJ SCHEDULE', name)
+        return True
+    return False
+
+def delete_drink(name):
+    if config.has_option('DRINKS', name):
+        config.remove_option('DRINKS', name)
+        return True
+    return False

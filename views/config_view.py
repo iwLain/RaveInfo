@@ -1,6 +1,6 @@
 from flask import render_template, request, redirect, url_for, flash, session
 from app import app, config, CONFIG_FILE
-from utils import ensure_sections, parse_dj_details, allowed_file, save_password, secure_filename
+from utils import ensure_sections, parse_dj_details, allowed_file, save_password, secure_filename, delete_dj, delete_drink
 import configparser
 
 @app.route('/config', methods=['GET', 'POST'])
@@ -32,8 +32,10 @@ def handle_post_request(request, editable_sections):
     action = request.form.get('action')
     if action == 'save':
         save_configurations(request, editable_sections)
-    elif action == 'delete':
-        delete_configuration(request, editable_sections)
+    elif action == 'delete-dj':
+        delete_dj_action(request)
+    elif action == 'delete-drink':
+        delete_drink_action(request)
     elif action == 'add-dj':
         add_dj(request)
     elif action == 'add-drink':
@@ -124,10 +126,20 @@ def update_admin_password(request):
         flash('Admin password updated successfully.')
 
 
-def delete_configuration(request, editable_sections):
-    section, key = request.form['delete'].split('-')
-    if section in editable_sections:
-        config.remove_option(section, key)
+def delete_dj_action(request):
+    dj_name = request.form.get('delete-dj')
+    if delete_dj(dj_name):
+        flash(f'DJ {dj_name} deleted successfully.')
+    else:
+        flash(f'Error deleting DJ {dj_name}.')
+
+
+def delete_drink_action(request):
+    drink_name = request.form.get('delete-drink')
+    if delete_drink(drink_name):
+        flash(f'Drink {drink_name} deleted successfully.')
+    else:
+        flash(f'Error deleting drink {drink_name}.')
 
 
 def add_dj(request):
@@ -151,17 +163,7 @@ def add_drink(request):
 
 def clear_configurations():
     config.clear()
-    config.add_section('FLASK')
-    config.set('FLASK', 'debug', 'True')
-    config.add_section('DJ SCHEDULE')
-    config.add_section('DRINKS')
-    config.add_section('HOME')
-    config.set('HOME', 'text', 'Welcome to our event!')
-    config.set('HOME', 'image', 'event.png')
-    config.add_section('LOCATION')
-    config.set('LOCATION', 'link', '')
-    config.add_section('TICKETS')
-    config.set('TICKETS', 'link', '')
+    ensure_sections()
 
 
 def load_context():
